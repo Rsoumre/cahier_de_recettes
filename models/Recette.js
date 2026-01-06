@@ -14,8 +14,8 @@ const recetteSchema = new mongoose.Schema({
     required: true
   },
   auteur: {
-    type: String,
-    required: true
+    type: Number,
+    required: true,
   },
   date: {
     type: Date,
