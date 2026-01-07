@@ -24,6 +24,7 @@ exports.getAllRecettes = async (req, res) => {
 // Lire une recette par ID
 exports.getRecetteById = async (req, res) => {
   try {
+    console.log(req.params.id);
     const recette = await Recette.findById(req.params.id);
     if (!recette) {
       return res.status(404).json({ message: 'Recette non trouvée' });
