@@ -3,7 +3,7 @@ const connectDB = require('./config/db');
 const userRoutes = require('./routes/user.routes');
 const recetteRoutes = require('./routes/recette.routes');
 
-const commentaireRoutes = require('./routes/commentaire.route');
+const commentaireRoutes = require('./routes/commentaire.routes');
 
 // Connexion à la base de données
 connectDB();
