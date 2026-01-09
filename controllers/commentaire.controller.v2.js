@@ -5,23 +5,31 @@ const mongoose = require('mongoose');
 exports.createCommentaire = async (req, res) => {
   try {
     const { auteur, message, recette } = req.body;
+
+    // verication des champs obligatoires
     if (!auteur || !message || !recette) {
       return res.status(400).json({ message: 'Les champs `auteur`, `message` et `recette` sont requis.' });
     }
+
+    // verification que l'id de la recette est valide
     if (!mongoose.Types.ObjectId.isValid(recette)) {
       return res.status(400).json({ message: 'ID de recette invalide.' });
     }
+
+    // nettoyage du message et verification de sa longueur
     const trimmedMessage = String(message).trim();
     if (trimmedMessage.length < 2 || trimmedMessage.length > 2000) {
       return res.status(400).json({ message: 'Le message doit contenir entre 2 et 2000 caractères.' });
     }
 
+    // creation d'un nouvel objet commentaire
     const commentaire = new Commentaire({
       auteur: String(auteur).trim(),
       message: trimmedMessage,
       recette
     });
 
+    // sauvegarde en base de données
     await commentaire.save();
     res.status(201).json(commentaire);
   } catch (error) {
@@ -33,6 +41,8 @@ exports.createCommentaire = async (req, res) => {
 exports.getAllCommentaires = async (req, res) => {
   try {
     const { recette, page = 1, limit = 20 } = req.query;
+
+    // preparation du filtre
     const filter = {};
     if (recette) {
       if (!mongoose.Types.ObjectId.isValid(recette)) {
@@ -41,17 +51,19 @@ exports.getAllCommentaires = async (req, res) => {
       filter.recette = recette;
     }
 
+    // pagination
     const p = Math.max(parseInt(page, 10) || 1, 1);
     const l = Math.max(parseInt(limit, 10) || 20, 1);
     const skip = (p - 1) * l;
 
+    //recupération des commentaires avec total pour pagination
     const [total, data] = await Promise.all([
       Commentaire.countDocuments(filter),
       Commentaire.find(filter)
-        .sort({ date: -1 })
+        .sort({ date: -1 }) // trier par date décroissante
         .skip(skip)
         .limit(l)
-        .populate('recette', 'titre')
+        .populate('recette', 'titre') // peupler le champ recette avec son titre    
     ]);
 
     res.json({ total, page: p, limit: l, data });
@@ -92,6 +104,7 @@ exports.updateCommentaire = async (req, res) => {
       updates.message = m;
     }
 
+    // mise a jour base
     const updated = await Commentaire.findByIdAndUpdate(id, updates, { new: true, runValidators: true });
     if (!updated) return res.status(404).json({ message: 'Commentaire non trouvé.' });
     res.json(updated);

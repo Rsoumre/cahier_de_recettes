@@ -1,9 +1,14 @@
 const User = require('../models/User');
 const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
 
-// Get all users
+
+
+// Recupérer tous les utilisateurs
 exports.getAllUsers = async (req, res) => {
     try {
+
+        // Recupération des utilisateurs en base de données
         const users = await User.find();
         res.status(200).json(users);
     } catch (error) {
@@ -11,7 +16,7 @@ exports.getAllUsers = async (req, res) => {
     }
 };
 
-// Get user by ID
+// Recupérer un utilisateur par ID
 exports.getUserById = async (req, res) => {
     try {
         const user = await User.findById(req.params.id);
@@ -22,43 +27,60 @@ exports.getUserById = async (req, res) => {
     }
 };
 
-// Register user
+// Inscrire un nouvel utilisateur
 exports.register = async (req, res) => {
     try {
+        // hashage du mot de passe
         const hashedPassword = await bcrypt.hash(req.body.password, 10);
+        // creation d'un nouvel utilisateur
         const user = new User({ ...req.body, password: hashedPassword });
         await user.save();
-        res.status(201).json(user);
+        res.status(201).json(user); // recupérer l'utilisateur créé
     } catch (error) {
         res.status(400).json({ message: error.message });
     }
 };
 
-// Login user
+// Connexion utilisateur
 exports.login = async (req, res) => {
-    try {
-        const user = await User.findOne({ email: req.body.email });
-        if (!user) return res.status(404).json({ message: 'User not found' });
+  try {
+    //recupération de l'utilisateur par email
+    const user = await User.findOne({ email: req.body.email });
+    if (!user) return res.status(404).json({ message: 'User not found' });
+    // vérification du mot de passe     
+    const isMatch = await bcrypt.compare(req.body.password, user.password);
+    if (!isMatch) return res.status(400).json({ message: 'Invalid credentials' });
 
-        const isMatch = await bcrypt.compare(req.body.password, user.password);
-        if (!isMatch) return res.status(400).json({ message: 'Invalid credentials' });
+    // Création du token
+    const token = jwt.sign(
+      { id: user._id },        // payload du token 
+      process.env.JWT_SECRET,  // clé secrète
+      { expiresIn: '1h' }      // expiration du token
+    );
 
-        res.status(200).json({ message: 'Login successful', userId: user._id });
-    } catch (error) {
-        res.status(500).json({ message: error.message });
-    }
+    res.status(200).json({
+      message: 'Login successful',
+      token: token
+    });
+
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
 };
 
-// Logout user
+
+
+// Deconnexion utilisateur
 exports.logout = (req, res) => {
-    // Ici tu peux gérer la suppression du token côté client si JWT est utilisé
+    // avec jwt la deconnexion se fait coté client en supprimant le token
     res.status(200).json({ message: 'Logout successful' });
 };
 
 
-// Update user
+// Mettre à jour un utilisateur
 exports.updateUser = async (req, res) => {
     try {
+        // mise a jour de donnees utilisateur
         const user = await User.findByIdAndUpdate(req.params.id, req.body, { new: true });
         if (!user) return res.status(404).json({ message: 'User not found' });
         res.status(200).json(user);
@@ -67,7 +89,7 @@ exports.updateUser = async (req, res) => {
     }
 };
 
-// Delete user
+// Supprimer un utilisateur
 exports.deleteUser = async (req, res) => {
     try {
         const user = await User.findByIdAndDelete(req.params.id);

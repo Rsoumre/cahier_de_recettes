@@ -1,0 +1,212 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "description": "API pour partager des recettes de cuisine",
+    "version": "1.0.0",
+    "title": "Cahier de recettes"
+  },
+  "host": "localhost:3000",
+  "basePath": "/",
+  "schemes": ["http"],
+  "paths": {
+    "/users/register": {
+      "post": {
+        "tags": ["Users"],
+        "summary": "Créer un nouvel utilisateur",
+        "consumes": ["application/json"],
+        "produces": ["application/json"],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "description": "Objet utilisateur",
+            "required": true,
+            "schema": { "$ref": "#/definitions/User" }
+          }
+        ],
+        "responses": {
+          "201": { "description": "Utilisateur créé" },
+          "400": { "description": "Erreur validation" }
+        }
+      }
+    },
+    "/users/login": {
+      "post": {
+        "tags": ["Users"],
+        "summary": "Connexion utilisateur",
+        "consumes": ["application/json"],
+        "produces": ["application/json"],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "description": "Email et mot de passe",
+            "required": true,
+            "schema": { "$ref": "#/definitions/UserLogin" }
+          }
+        ],
+        "responses": {
+          "200": { "description": "Login réussi, retourne token" },
+          "400": { "description": "Mot de passe invalide" },
+          "404": { "description": "Utilisateur non trouvé" }
+        }
+      }
+    },
+    "/users": {
+      "get": {
+        "tags": ["Users"],
+        "summary": "Récupérer tous les utilisateurs",
+        "produces": ["application/json"],
+        "responses": {
+          "200": { "description": "Liste des utilisateurs" },
+          "401": { "description": "Non autorisé" }
+        },
+        "security": [{"bearerAuth": []}]
+      }
+    },
+    "/users/{id}": {
+      "get": {
+        "tags": ["Users"],
+        "summary": "Récupérer un utilisateur par ID",
+        "produces": ["application/json"],
+        "parameters": [
+          {"name": "id", "in": "path", "required": true, "type": "string"}
+        ],
+        "responses": {
+          "200": { "description": "Utilisateur trouvé" },
+          "404": { "description": "Utilisateur non trouvé" },
+          "401": { "description": "Non autorisé" }
+        },
+        "security": [{"bearerAuth": []}]
+      },
+      "put": {
+        "tags": ["Users"],
+        "summary": "Modifier un utilisateur",
+        "consumes": ["application/json"],
+        "produces": ["application/json"],
+        "parameters": [
+          {"name": "id", "in": "path", "required": true, "type": "string"},
+          {"in": "body", "name": "body", "description": "Données utilisateur à modifier", "required": true, "schema": {"$ref": "#/definitions/User"}}
+        ],
+        "responses": {
+          "200": { "description": "Utilisateur modifié" },
+          "404": { "description": "Utilisateur non trouvé" },
+          "401": { "description": "Non autorisé" }
+        },
+        "security": [{"bearerAuth": []}]
+      },
+      "delete": {
+        "tags": ["Users"],
+        "summary": "Supprimer un utilisateur",
+        "produces": ["application/json"],
+        "parameters": [{"name": "id", "in": "path", "required": true, "type": "string"}],
+        "responses": {
+          "200": { "description": "Utilisateur supprimé" },
+          "404": { "description": "Utilisateur non trouvé" },
+          "401": { "description": "Non autorisé" }
+        },
+        "security": [{"bearerAuth": []}]
+      }
+    },
+    "/recettes": {
+      "get": {
+        "tags": ["Recettes"],
+        "summary": "Récupérer toutes les recettes",
+        "produces": ["application/json"],
+        "responses": {"200": {"description": "Liste des recettes"}}
+      },
+      "post": {
+        "tags": ["Recettes"],
+        "summary": "Ajouter une recette",
+        "consumes": ["application/json"],
+        "produces": ["application/json"],
+        "parameters": [
+          {"in": "body", "name": "body", "description": "Objet recette", "required": true, "schema": {"$ref": "#/definitions/Recette"}}
+        ],
+        "responses": {
+          "201": {"description": "Recette créée"},
+          "400": {"description": "Erreur validation"},
+          "401": {"description": "Non autorisé"}
+        },
+        "security": [{"bearerAuth": []}]
+      }
+    },
+    "/recettes/{id}": {
+      "get": {
+        "tags": ["Recettes"],
+        "summary": "Récupérer une recette par ID",
+        "produces": ["application/json"],
+        "parameters": [{"name": "id", "in": "path", "required": true, "type": "string"}],
+        "responses": {
+          "200": {"description": "Recette trouvée"},
+          "404": {"description": "Recette non trouvée"}
+        }
+      },
+      "put": {
+        "tags": ["Recettes"],
+        "summary": "Modifier une recette",
+        "consumes": ["application/json"],
+        "produces": ["application/json"],
+        "parameters": [
+          {"name": "id", "in": "path", "required": true, "type": "string"},
+          {"in": "body", "name": "body", "description": "Recette à modifier", "required": true, "schema": {"$ref": "#/definitions/Recette"}}
+        ],
+        "responses": {
+          "200": {"description": "Recette modifiée"},
+          "404": {"description": "Recette non trouvée"},
+          "401": {"description": "Non autorisé"}
+        },
+        "security": [{"bearerAuth": []}]
+      },
+      "delete": {
+        "tags": ["Recettes"],
+        "summary": "Supprimer une recette",
+        "produces": ["application/json"],
+        "parameters": [{"name": "id", "in": "path", "required": true, "type": "string"}],
+        "responses": {
+          "200": {"description": "Recette supprimée"},
+          "404": {"description": "Recette non trouvée"},
+          "401": {"description": "Non autorisé"}
+        },
+        "security": [{"bearerAuth": []}]
+      }
+    }
+  },
+  "definitions": {
+    "User": {
+      "type": "object",
+      "required": ["name", "email", "password"],
+      "properties": {
+        "name": {"type": "string", "example": "Harouna"},
+        "email": {"type": "string", "example": "test@test.com"},
+        "password": {"type": "string", "example": "123456"}
+      }
+    },
+    "UserLogin": {
+      "type": "object",
+      "required": ["email", "password"],
+      "properties": {
+        "email": {"type": "string", "example": "test@test.com"},
+        "password": {"type": "string", "example": "123456"}
+      }
+    },
+    "Recette": {
+      "type": "object",
+      "required": ["titre", "ingredients", "etapes"],
+      "properties": {
+        "titre": {"type": "string", "example": "Pizza"},
+        "ingredients": {"type": "array", "items": {"type": "string"}, "example": ["farine","tomate","fromage"]},
+        "etapes": {"type": "array", "items": {"type": "string"}, "example": ["préparer la pâte","mettre la sauce","cuire 20 min"]},
+        "auteur": {"type": "string", "example": "6960ca45d0e5a2431b0b4630"},
+        "date": {"type": "string", "example": "2026-01-09T09:37:04.058Z"}
+      }
+    }
+  },
+  "securityDefinitions": {
+    "bearerAuth": {
+      "type": "apiKey",
+      "name": "Authorization",
+      "in": "header"
+    }
+  }
+}

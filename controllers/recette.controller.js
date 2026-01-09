@@ -3,13 +3,19 @@ const Recette = require('../models/Recette');
 // Créer une recette
 exports.createRecette = async (req, res) => {
   try {
-    const recette = new Recette(req.body);
+    // On prend l'id ou le nom de l'utilisateur depuis le token
+    const recette = new Recette({
+      ...req.body,
+      auteur: req.user.id // ou req.user.name si tu stockes le nom dans le token
+    });
+
     await recette.save();
     res.status(201).json(recette);
   } catch (error) {
     res.status(400).json({ message: error.message });
   }
 };
+
 
 // Lire toutes les recettes
 exports.getAllRecettes = async (req, res) => {

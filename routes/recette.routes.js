@@ -1,13 +1,22 @@
 const express = require('express');
 const router = express.Router();
 const recetteController = require('../controllers/recette.controller');
+const auth = require('../middlewares/auth');
 
-// Routes pour les recettes
-router.post('/', recetteController.createRecette);
+// Routes publiques
+
+// récupérer toutes les recettes
 router.get('/', recetteController.getAllRecettes);
+// récupérer une recette par ID
 router.get('/:id', recetteController.getRecetteById);
-router.put('/:id', recetteController.updateRecette);
-router.delete('/:id', recetteController.deleteRecette);
 
+// Routes protégées
+
+// créer une recette
+router.post('/', auth, recetteController.createRecette);
+// mettre à jour une recette
+router.put('/:id', auth, recetteController.updateRecette);
+// supprimer une recette
+router.delete('/:id', auth, recetteController.deleteRecette);
 
 module.exports = router;

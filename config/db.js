@@ -9,7 +9,6 @@ const connectDB = async () => {
   } catch (error) {
     console.error('Database connection failed:', error.message);
     console.error('Vérifiez la valeur de MONGODB_URI dans .env (identifiants/permissions).');
-    // Ne quittez pas le processus : laisser nodemon en mode développement
   }
 };
 
