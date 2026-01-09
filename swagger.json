@@ -171,13 +171,66 @@
         "security": [{"bearerAuth": []}]
       }
     }
+    ,
+    "/recettes/{id}/commentaires": {
+      "get": {
+        "tags": ["Commentaires"],
+        "summary": "Récupérer les commentaires d'une recette",
+        "produces": ["application/json"],
+        "parameters": [
+          {"name": "id", "in": "path", "required": true, "type": "string"}
+        ],
+        "responses": {"200": {"description": "Liste des commentaires"}}
+      },
+      "post": {
+        "tags": ["Commentaires"],
+        "summary": "Ajouter un commentaire à une recette (protégé)",
+        "consumes": ["application/json"],
+        "produces": ["application/json"],
+        "parameters": [
+          {"name": "id", "in": "path", "required": true, "type": "string"},
+          {"in": "body", "name": "body", "description": "Commentaire", "required": true, "schema": {"$ref": "#/definitions/Commentaire"}}
+        ],
+        "responses": {"201": {"description": "Commentaire créé"}, "401": {"description": "Non autorisé"}},
+        "security": [{"bearerAuth": []}]
+      }
+    },
+    "/commentaires/{id}": {
+      "get": {
+        "tags": ["Commentaires"],
+        "summary": "Récupérer un commentaire par ID",
+        "produces": ["application/json"],
+        "parameters": [{"name": "id", "in": "path", "required": true, "type": "string"}],
+        "responses": {"200": {"description": "Commentaire trouvé"}, "404": {"description": "Non trouvé"}}
+      },
+      "put": {
+        "tags": ["Commentaires"],
+        "summary": "Modifier un commentaire (protégé)",
+        "consumes": ["application/json"],
+        "produces": ["application/json"],
+        "parameters": [
+          {"name": "id", "in": "path", "required": true, "type": "string"},
+          {"in": "body", "name": "body", "description": "Commentaire modifié", "required": true, "schema": {"$ref": "#/definitions/Commentaire"}}
+        ],
+        "responses": {"200": {"description": "Commentaire modifié"}, "401": {"description": "Non autorisé"}},
+        "security": [{"bearerAuth": []}]
+      },
+      "delete": {
+        "tags": ["Commentaires"],
+        "summary": "Supprimer un commentaire (protégé)",
+        "produces": ["application/json"],
+        "parameters": [{"name": "id", "in": "path", "required": true, "type": "string"}],
+        "responses": {"200": {"description": "Commentaire supprimé"}, "401": {"description": "Non autorisé"}},
+        "security": [{"bearerAuth": []}]
+      }
+    }
   },
   "definitions": {
     "User": {
       "type": "object",
-      "required": ["name", "email", "password"],
+      "required": ["username", "email", "password"],
       "properties": {
-        "name": {"type": "string", "example": "Harouna"},
+        "username": {"type": "string", "example": "Harouna"},
         "email": {"type": "string", "example": "test@test.com"},
         "password": {"type": "string", "example": "123456"}
       }
@@ -199,6 +252,16 @@
         "etapes": {"type": "array", "items": {"type": "string"}, "example": ["préparer la pâte","mettre la sauce","cuire 20 min"]},
         "auteur": {"type": "string", "example": "6960ca45d0e5a2431b0b4630"},
         "date": {"type": "string", "example": "2026-01-09T09:37:04.058Z"}
+      }
+    }
+  ,
+    "Commentaire": {
+      "type": "object",
+      "required": ["auteur", "contenu"],
+      "properties": {
+        "auteur": { "type": "string", "example": "6960ca45d0e5a2431b0b4630" },
+        "contenu": { "type": "string", "example": "Très bonne recette !" },
+        "date": { "type": "string", "example": "2026-01-09T10:00:00.000Z" }
       }
     }
   },

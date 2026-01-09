@@ -6,6 +6,18 @@ const recetteRoutes = require('./routes/recette.routes');
 const commentaireRoutes = require('./routes/commentaire.routes');
 require('dotenv').config();
 
+// Swagger UI
+let swaggerUi;
+let swaggerDocument;
+try {
+  swaggerUi = require('swagger-ui-express');
+  swaggerDocument = require('./swagger.json');
+} catch (err) {
+  // swagger-ui-express not installed or swagger.json missing
+  swaggerUi = null;
+  swaggerDocument = null;
+}
+
 // Connexion à la base de données
 connectDB();
 
@@ -17,6 +29,11 @@ app.use(express.json());
 app.use ('/recettes', recetteRoutes);
 app.use('/users',userRoutes);
 app.use('/commentaires', commentaireRoutes);
+
+// Serve Swagger UI if available
+if (swaggerUi && swaggerDocument) {
+  app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+}
 
 // Route de base
 app.get('/', (req, res) => {
